@@ -1,4 +1,4 @@
-Photo collage
+Photo collage with tiles sorted by their color models
 ---------------
 
 This project converts a collection of images in a directory into a collage where the images are sorted by their color models. The images in an output collage are arranged in a grid as close to square as possible, in order left to right, top to bottom. The supported color models are RGB, YIQ, HLS, HSV.
