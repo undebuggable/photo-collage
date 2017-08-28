@@ -1,13 +1,9 @@
 from PIL import Image
-from optparse import OptionParser
-import os, subprocess, math, colorsys, dominant_colors, image_crop, shutil, mimetypes, time
+import os, subprocess, math, colorsys, shutil, mimetypes, time
+from . import dominant_colors, image_crop
+from ..config import constants
 from collections import namedtuple
 
-IMAGE_MIMETYPES = [
-  'image/png',
-  'image/jpg',
-  'image/jpeg'
-]
 COLLAGE_PHOTOS = ""
 TILE_SIZE = 256
 COLLAGE_PREFIX = "collage-"
@@ -115,7 +111,9 @@ def printLabels(path, colors):
     s = subprocess.Popen(printCommand)
     s.wait()
 
-def createCollage():
+def createCollage(directory_path):
+    global COLLAGE_PHOTOS
+    COLLAGE_PHOTOS = directory_path
     photoCount = 0
     collageRGB = [
         "montage"
@@ -146,7 +144,7 @@ def createCollage():
             os.remove(joinPath(COLLAGE_PHOTOS, file))
     for file in os.listdir(COLLAGE_PHOTOS):
         (mimeType, encoding) = mimetypes.guess_type(file)
-        if mimeType in IMAGE_MIMETYPES and not file.startswith(COLLAGE_PREFIX) and not file.startswith(DOMINANT_PREFIX):
+        if mimeType in constants.IMAGE_MIMETYPES and not file.startswith(COLLAGE_PREFIX) and not file.startswith(DOMINANT_PREFIX):
             collagePath = joinPath(COLLAGE_PHOTOS, COLLAGE_PREFIX + os.path.splitext(file)[0] + ".png")
             dominantPath = joinPath(COLLAGE_PHOTOS, DOMINANT_PREFIX + os.path.splitext(file)[0] + ".png")
             s = subprocess.Popen([
@@ -284,20 +282,3 @@ def createCollage():
     s = subprocess.Popen(collageHSVDominant)
     s.wait()
 
-def parseParams():
-    global COLLAGE_PHOTOS
-    parser = OptionParser()
-    (options, args) = parser.parse_args()
-    if len(args) != 1:
-        print "Please specify directory with images"
-        return False
-    if len(args) == 1 and not os.path.isdir(args[0]):
-        print "The directory with images doesn't exist"
-        return False
-    COLLAGE_PHOTOS = args[0]
-    return True
-
-if parseParams():
-    createCollage()
-else:
-    print "Try again"

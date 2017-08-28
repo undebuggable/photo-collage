@@ -1,0 +1,2 @@
+1. Implement loading the config from photo_collage.ini
+2. ImageMagick sometimes incorrectly interprets the image orientation and the tiles in the collage are rotated (probably related to EXIF?)

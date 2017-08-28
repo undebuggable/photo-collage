@@ -1,5 +1,5 @@
 __all__ = [
-    "photo_collage",
+    "process_images",
     "image_crop",
     "dominant_colors"
 ]
