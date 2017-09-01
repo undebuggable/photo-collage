@@ -4,10 +4,8 @@ from . import dominant_colors, image_crop
 from ..config import constants
 from collections import namedtuple
 
-COLLAGE_PHOTOS = ""
+DIR_IMG = ""
 TILE_SIZE = 256
-COLLAGE_PREFIX = "collage-"
-DOMINANT_PREFIX = "dominant-"
 DOMINANT_COLORS = 1
 LABEL_POINTSIZE = 18
 colors = []
@@ -112,8 +110,8 @@ def printLabels(path, colors):
     s.wait()
 
 def createCollage(directory_path):
-    global COLLAGE_PHOTOS
-    COLLAGE_PHOTOS = directory_path
+    global DIR_IMG
+    DIR_IMG = directory_path
     photoCount = 0
     collageRGB = [
         "montage"
@@ -139,17 +137,17 @@ def createCollage(directory_path):
     collageHSVDominant = [
         "montage"
     ]
-    for file in os.listdir(COLLAGE_PHOTOS):
-        if file.startswith(COLLAGE_PREFIX) or file.startswith(DOMINANT_PREFIX):
-            os.remove(joinPath(COLLAGE_PHOTOS, file))
-    for file in os.listdir(COLLAGE_PHOTOS):
+    for file in os.listdir(DIR_IMG):
+        if file.startswith(constants.FILE_PREFIX_TILE) or file.startswith(constants.FILE_PREFIX_TILE_DOMINANT):
+            os.remove(joinPath(DIR_IMG, file))
+    for file in os.listdir(DIR_IMG):
         (mimeType, encoding) = mimetypes.guess_type(file)
-        if mimeType in constants.IMAGE_MIMETYPES and not file.startswith(COLLAGE_PREFIX) and not file.startswith(DOMINANT_PREFIX):
-            collagePath = joinPath(COLLAGE_PHOTOS, COLLAGE_PREFIX + os.path.splitext(file)[0] + ".png")
-            dominantPath = joinPath(COLLAGE_PHOTOS, DOMINANT_PREFIX + os.path.splitext(file)[0] + ".png")
+        if mimeType in constants.IMAGE_MIMETYPES and not file.startswith(constants.FILE_PREFIX_TILE) and not file.startswith(constants.FILE_PREFIX_TILE_DOMINANT):
+            collagePath = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE + os.path.splitext(file)[0] + ".png")
+            dominantPath = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE_DOMINANT + os.path.splitext(file)[0] + ".png")
             s = subprocess.Popen([
                 "convert",
-                joinPath(COLLAGE_PHOTOS, file),
+                joinPath(DIR_IMG, file),
                 "-resize",
                 str(TILE_SIZE) + "x" + str(TILE_SIZE) + "^",
 #                "-gravity",
@@ -205,80 +203,80 @@ def createCollage(directory_path):
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-RGB.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_RGB)
     ])
     collageYIQ.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-YIQ.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_YIQ)
     ])
     collageHLS.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-HLS.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HLS)
     ])
     collageHSV.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-HSV.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HSV)
     ])
     collageRGBDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-RGB-dominant.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_RGB_DOMINANT)
     ])
     collageYIQDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-YIQ-dominant.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_YIQ_DOMINANT)
     ])
     collageHLSDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-HLS-dominant.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HLS_DOMINANT)
     ])
     collageHSVDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
         str(width) + "x" + str(height),
-        joinPath(COLLAGE_PHOTOS, "all-" + timestamp + str(DOMINANT_COLORS) +"-HSV-dominant.png")
+        joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HSV_DOMINANT)
     ])
     print "\nTotal " + str(photoCount) + " images"
-    print "\nCreating collage sorted by RGB"
+    print constants.LOG_CREATING_RGB
     s = subprocess.Popen(collageRGB)
     s.wait()
-    print "\nCreating collage sorted by YIQ"
+    print constants.LOG_CREATING_YIQ
     s = subprocess.Popen(collageYIQ)
     s.wait()
-    print "\nCreating collage sorted by HLS"
+    print constants.LOG_CREATING_HLS
     s = subprocess.Popen(collageHLS)
     s.wait()
-    print "\nCreating collage sorted by HSV"
+    print constants.LOG_CREATING_HSV
     s = subprocess.Popen(collageHSV)
     s.wait()
-    print "\nCreating collage sorted by RGB with dominant colors"
+    print constants.LOG_CREATING_RGB_DOMINANT
     s = subprocess.Popen(collageRGBDominant)
     s.wait()
-    print "\nCreating collage sorted by YIQ with dominant colors"
+    print constants.LOG_CREATING_YIQ_DOMINANT
     s = subprocess.Popen(collageYIQDominant)
     s.wait()
-    print "\nCreating collage sorted by HLS with dominant colors"
+    print constants.LOG_CREATING_HLS_DOMINANT
     s = subprocess.Popen(collageHLSDominant)
     s.wait()
-    print "\nCreating collage sorted by HSV with dominant colors"
+    print constants.LOG_CREATING_HSV_DOMINANT
     s = subprocess.Popen(collageHSVDominant)
     s.wait()
 

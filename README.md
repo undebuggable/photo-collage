@@ -5,7 +5,7 @@ This project converts a collection of images in a directory into a collage where
 
 Example invocation:
 ```
-make collage-jpg PHOTOS=/home/user1/Photos/holidays-in-exotic-place/
+make collage-jpg DIR_IMG=/home/user1/Photos/my-holidays-in-exotic-place/
 ```
 
 Example output collages:
