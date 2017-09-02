@@ -4,6 +4,8 @@ IMAGE_MIMETYPES = [
   'image/jpeg'
 ]
 
+FILE_USERCONFIG = 'photo_collage.ini'
+
 FILE_PREFIX_TILE = "collage-"
 FILE_PREFIX_TILE_DOMINANT = "dominant-"
 FILE_PREFIX_COLLAGE = "all-"
@@ -25,3 +27,5 @@ LOG_CREATING_RGB_DOMINANT = "\nCreating collage sorted by RGB with dominant colo
 LOG_CREATING_YIQ_DOMINANT = "\nCreating collage sorted by YIQ with dominant colors"
 LOG_CREATING_HLS_DOMINANT = "\nCreating collage sorted by HLS with dominant colors"
 LOG_CREATING_HSV_DOMINANT = "\nCreating collage sorted by HSV with dominant colors"
+LOG_DRAWING_COLORS = "\nDrawing the dominant colors\n"
+LOG_DRAWING_LABELS = "\nPrinting the labels\n"

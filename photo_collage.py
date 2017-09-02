@@ -1,6 +1,7 @@
-import os
+import os, ConfigParser, codecs
 from optparse import OptionParser
 from photo_collage_pkg.app import process_images
+from photo_collage_pkg.config import constants
 
 directory_path = ""
 def parseParams():
@@ -17,6 +18,10 @@ def parseParams():
     return True
 
 if parseParams():
-    process_images.createCollage(directory_path)
+    user_config = ConfigParser.ConfigParser()
+    # Don't convert keys to lowercase
+    user_config.optionxform = lambda option: option
+    user_config.readfp(codecs.open(constants.FILE_USERCONFIG, 'r', 'utf8'))
+    process_images.createCollage(directory_path, user_config)
 else:
     print "Try again"

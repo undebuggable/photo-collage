@@ -55,7 +55,7 @@ def sortColors():
         insert(c, "HSV")
 
 def drawColors(path, colors):
-    print "\nDrawing dominant colors\n" + path + "\n" + str(colors)
+    print constants.LOG_DRAWING_COLORS + path + "\n" + str(colors)
     sectionHeight = TILE_SIZE*1/len(colors)
     rectangles = []
     for i in range(len(colors)):
@@ -76,7 +76,7 @@ def drawColors(path, colors):
     s.wait()
 
 def printLabels(path, colors):
-    print "\nPrinting labels\n" + path + "\n" + str(colors)
+    print constants.LOG_DRAWING_LABELS + path + "\n" + str(colors)
     sectionHeight = TILE_SIZE*1/len(colors)
     labels = []
     printCommand = [
@@ -109,7 +109,42 @@ def printLabels(path, colors):
     s = subprocess.Popen(printCommand)
     s.wait()
 
-def createCollage(directory_path):
+def createCollageForColoModel (
+        key_color_model, command_collage, count_tile_rows, count_tile_columns
+    ):
+    collageRGB = [
+        "montage"
+    ]
+    string_by_color_model = {
+        "RGB": [constants.FILE_SUFFIX_RGB, constants.LOG_CREATING_RGB],
+        "YIQ": [constants.FILE_SUFFIX_YIQ, constants.LOG_CREATING_YIQ],
+        "HLS": [constants.FILE_SUFFIX_HLS, constants.LOG_CREATING_HLS],
+        "HSV": [constants.FILE_SUFFIX_HSV, constants.LOG_CREATING_HSV],
+        "RGB_dominant": [constants.FILE_SUFFIX_RGB_DOMINANT, constants.LOG_CREATING_RGB_DOMINANT],
+        "YIQ_dominant": [constants.FILE_SUFFIX_YIQ_DOMINANT, constants.LOG_CREATING_YIQ_DOMINANT],
+        "HLS_dominant": [constants.FILE_SUFFIX_HLS_DOMINANT, constants.LOG_CREATING_HLS_DOMINANT],
+        "HSV_dominant": [constants.FILE_SUFFIX_HSV_DOMINANT, constants.LOG_CREATING_HSV_DOMINANT]
+    }
+    timestamp = str(int(time.time()))
+    for c in byRGB:
+        collageRGB.append(c.get("path_collage"))
+    command_collage.extend([
+        "-geometry",
+        str(TILE_SIZE) + "x" + str(
+            TILE_SIZE * 2 if key_color_model.endswith('_dominant') else TILE_SIZE
+        ) + "+0+0",
+        "-tile",
+        str(count_tile_columns) + "x" + str(count_tile_rows),
+        joinPath(
+            DIR_IMG,
+            constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + string_by_color_model[key_color_model][0]
+        )
+    ])
+    print string_by_color_model[key_color_model][1]
+    s = subprocess.Popen(command_collage)
+    s.wait()
+
+def createCollage(directory_path, user_config):
     global DIR_IMG
     DIR_IMG = directory_path
     photoCount = 0
@@ -138,13 +173,10 @@ def createCollage(directory_path):
         "montage"
     ]
     for file in os.listdir(DIR_IMG):
-        if file.startswith(constants.FILE_PREFIX_TILE) or file.startswith(constants.FILE_PREFIX_TILE_DOMINANT):
-            os.remove(joinPath(DIR_IMG, file))
-    for file in os.listdir(DIR_IMG):
         (mimeType, encoding) = mimetypes.guess_type(file)
         if mimeType in constants.IMAGE_MIMETYPES and not file.startswith(constants.FILE_PREFIX_TILE) and not file.startswith(constants.FILE_PREFIX_TILE_DOMINANT):
-            collagePath = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE + os.path.splitext(file)[0] + ".png")
-            dominantPath = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE_DOMINANT + os.path.splitext(file)[0] + ".png")
+            path_collage = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE + os.path.splitext(file)[0] + ".png")
+            path_dominant = joinPath(DIR_IMG, constants.FILE_PREFIX_TILE_DOMINANT + os.path.splitext(file)[0] + ".png")
             s = subprocess.Popen([
                 "convert",
                 joinPath(DIR_IMG, file),
@@ -154,107 +186,129 @@ def createCollage(directory_path):
 #                "center",
 #                "-extent",
 #                str(TILE_SIZE) + "x" + str(TILE_SIZE),
-                collagePath
+                path_collage
             ])
             s.wait()
-            cropped = image_crop.image_square(Image.open(collagePath))
-            cropped.save(collagePath)
-            shutil.copyfile(collagePath, dominantPath)
-            colorz = dominant_colors.colorz(collagePath, DOMINANT_COLORS)
-            drawColors(dominantPath, colorz)
-            printLabels(dominantPath, colorz)
+            cropped = image_crop.image_square(Image.open(path_collage))
+            cropped.save(path_collage)
+            shutil.copyfile(path_collage, path_dominant)
+            colorz = dominant_colors.colorz(path_collage, DOMINANT_COLORS)
+            drawColors(path_dominant, colorz)
+            printLabels(path_dominant, colorz)
             rgb = [
                 strToFraction("".join([colorz[0][1], colorz[0][2]])),
                 strToFraction("".join([colorz[0][3], colorz[0][4]])),
                 strToFraction("".join([colorz[0][5], colorz[0][6]]))
             ]
             colors.append({
-                "dominantPath": dominantPath,
-                "collagePath": collagePath,
+                "path_dominant": path_dominant,
+                "path_collage": path_collage,
                 "RGB_string": colorz[0],
                 "RGB": rgb,
                 "YIQ": colorsys.rgb_to_yiq(rgb[0], rgb[1], rgb[2]),
                 "HSV": colorsys.rgb_to_hsv(rgb[0], rgb[1], rgb[2]),
                 "HLS": colorsys.rgb_to_hls(rgb[0], rgb[1], rgb[2])
             })
-            photoCount = photoCount + 1 
-    width = math.ceil(photoCount ** 0.5)
-    height = math.ceil(photoCount/width)
+            photoCount = photoCount + 1
+    count_tile_columns = math.ceil(photoCount ** 0.5)
+    count_tile_rows = math.ceil(photoCount/count_tile_columns)
     timestamp = str(int(time.time()))
     sortColors()
+
     for c in byRGB:
-        collageRGB.append(c.get("collagePath"))
+        collageRGB.append(c.get("path_collage"))
     for c in byYIQ:
-        collageYIQ.append(c.get("collagePath"))
+        collageYIQ.append(c.get("path_collage"))
     for c in byHLS:
-        collageHLS.append(c.get("collagePath"))
+        collageHLS.append(c.get("path_collage"))
     for c in byHSV:
-        collageHSV.append(c.get("collagePath"))
+        collageHSV.append(c.get("path_collage"))
     for c in byRGB:
-        collageRGBDominant.append(c.get("dominantPath"))
+        collageRGBDominant.append(c.get("path_dominant"))
     for c in byYIQ:
-        collageYIQDominant.append(c.get("dominantPath"))
+        collageYIQDominant.append(c.get("path_dominant"))
     for c in byHLS:
-        collageHLSDominant.append(c.get("dominantPath"))
+        collageHLSDominant.append(c.get("path_dominant"))
     for c in byHSV:
-        collageHSVDominant.append(c.get("dominantPath"))
+        collageHSVDominant.append(c.get("path_dominant"))
+
+    for key_color_model, command_collage in [
+        ("RGB", collageRGB),
+        ("YIQ", collageYIQ),
+        ("HLS", collageHLS),
+        ("HSV", collageHSV),
+        ("RGB_dominant", collageRGBDominant),
+        ("YIQ_dominant", collageYIQDominant),
+        ("HLS_dominant", collageHLSDominant),
+        ("HSV_dominant", collageHSVDominant),
+    ]:
+        createCollageForColoModel(
+            key_color_model, command_collage, count_tile_rows, count_tile_columns
+        )
+
+
+        """
     collageRGB.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_RGB)
     ])
     collageYIQ.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_YIQ)
     ])
     collageHLS.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HLS)
     ])
     collageHSV.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HSV)
     ])
     collageRGBDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_RGB_DOMINANT)
     ])
     collageYIQDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_YIQ_DOMINANT)
     ])
     collageHLSDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HLS_DOMINANT)
     ])
     collageHSVDominant.extend([
         "-geometry",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE) + "+0+0",
         "-tile",
-        str(width) + "x" + str(height),
+        str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(DIR_IMG, constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + constants.FILE_SUFFIX_HSV_DOMINANT)
     ])
+    """
+
     print "\nTotal " + str(photoCount) + " images"
+
+    """
     print constants.LOG_CREATING_RGB
     s = subprocess.Popen(collageRGB)
     s.wait()
@@ -279,4 +333,5 @@ def createCollage(directory_path):
     print constants.LOG_CREATING_HSV_DOMINANT
     s = subprocess.Popen(collageHSVDominant)
     s.wait()
+    """
 
