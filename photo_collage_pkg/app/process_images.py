@@ -169,8 +169,8 @@ def loadUserConfig (user_config):
     global LABEL_POINTSIZE
     is_correct = True
     USER_CONFIG = user_config
-    if USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE) and
-    USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS) and
+    if USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE) and \
+    USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS) and \
     USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_POINTSIZES):
         TILE_SIZE = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE))
         DOMINANT_COLORS = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS))
