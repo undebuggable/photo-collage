@@ -22,6 +22,9 @@ if parseParams():
     # Don't convert keys to lowercase
     user_config.optionxform = lambda option: option
     user_config.readfp(codecs.open(constants.FILE_USERCONFIG, 'r', 'utf8'))
-    process_images.createCollage(directory_path, user_config)
+    if process_images.loadUserConfig(user_config):
+        process_images.createCollage(directory_path)
+    else:
+        print "The ini config file is incorrect"
 else:
     print "Try again"

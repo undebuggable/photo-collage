@@ -4,10 +4,10 @@ from . import dominant_colors, image_crop
 from ..config import constants
 from collections import namedtuple
 
-DIR_IMG = ""
-TILE_SIZE = 256
-DOMINANT_COLORS = 1
-LABEL_POINTSIZE = 18
+DIR_IMG = None
+TILE_SIZE = None
+DOMINANT_COLORS = None
+LABEL_POINTSIZE = None
 colors = []
 byRGB = []
 byYIQ = []
@@ -144,7 +144,22 @@ def createCollageForColoModel (
     s = subprocess.Popen(command_collage)
     s.wait()
 
-def createCollage(directory_path, user_config):
+def loadUserConfig (user_config):
+    global USER_CONFIG
+    global TILE_SIZE
+    global DOMINANT_COLORS
+    global LABEL_POINTSIZE
+    is_correct = True
+    USER_CONFIG = user_config
+    if USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE):
+        TILE_SIZE = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE))
+        DOMINANT_COLORS = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS))
+        LABEL_POINTSIZE = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_POINTSIZES))
+    else:
+        is_correct = False
+    return is_correct
+
+def createCollage(directory_path):
     global DIR_IMG
     DIR_IMG = directory_path
     photoCount = 0
