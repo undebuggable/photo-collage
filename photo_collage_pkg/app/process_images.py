@@ -59,7 +59,9 @@ def drawColors(path, colors):
     sectionHeight = TILE_SIZE*1/len(colors)
     rectangles = []
     for i in range(len(colors)):
-        rectangles.append("fill " + str(colors[i]) + " rectangle 0," + str(TILE_SIZE + i * sectionHeight) + " " + str(TILE_SIZE) + "," + str(TILE_SIZE + (i + 1) * sectionHeight))
+        rectangles.append(
+          "fill " + str(colors[i]) + " rectangle 0," + str(TILE_SIZE + i * sectionHeight) + " " + str(TILE_SIZE) + "," + str(TILE_SIZE + (i + 1) * sectionHeight)
+        )
     s = subprocess.Popen([
         "convert",
         path,
@@ -116,14 +118,30 @@ def createCollageForColoModel (
         "montage"
     ]
     string_by_color_model = {
-        "RGB": [constants.FILE_SUFFIX_RGB, constants.LOG_CREATING_RGB],
-        "YIQ": [constants.FILE_SUFFIX_YIQ, constants.LOG_CREATING_YIQ],
-        "HLS": [constants.FILE_SUFFIX_HLS, constants.LOG_CREATING_HLS],
-        "HSV": [constants.FILE_SUFFIX_HSV, constants.LOG_CREATING_HSV],
-        "RGB_dominant": [constants.FILE_SUFFIX_RGB_DOMINANT, constants.LOG_CREATING_RGB_DOMINANT],
-        "YIQ_dominant": [constants.FILE_SUFFIX_YIQ_DOMINANT, constants.LOG_CREATING_YIQ_DOMINANT],
-        "HLS_dominant": [constants.FILE_SUFFIX_HLS_DOMINANT, constants.LOG_CREATING_HLS_DOMINANT],
-        "HSV_dominant": [constants.FILE_SUFFIX_HSV_DOMINANT, constants.LOG_CREATING_HSV_DOMINANT]
+        "RGB": [
+          constants.FILE_SUFFIX_RGB, constants.LOG_CREATING_RGB
+        ],
+        "YIQ": [
+          constants.FILE_SUFFIX_YIQ, constants.LOG_CREATING_YIQ
+        ],
+        "HLS": [
+          constants.FILE_SUFFIX_HLS, constants.LOG_CREATING_HLS
+        ],
+        "HSV": [
+          constants.FILE_SUFFIX_HSV, constants.LOG_CREATING_HSV
+        ],
+        "RGB_dominant": [
+          constants.FILE_SUFFIX_RGB_DOMINANT, constants.LOG_CREATING_RGB_DOMINANT
+        ],
+        "YIQ_dominant": [
+          constants.FILE_SUFFIX_YIQ_DOMINANT, constants.LOG_CREATING_YIQ_DOMINANT
+        ],
+        "HLS_dominant": [
+          constants.FILE_SUFFIX_HLS_DOMINANT, constants.LOG_CREATING_HLS_DOMINANT
+        ],
+        "HSV_dominant": [
+          constants.FILE_SUFFIX_HSV_DOMINANT, constants.LOG_CREATING_HSV_DOMINANT
+        ]
     }
     timestamp = str(int(time.time()))
     for c in byRGB:
@@ -151,7 +169,9 @@ def loadUserConfig (user_config):
     global LABEL_POINTSIZE
     is_correct = True
     USER_CONFIG = user_config
-    if USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE):
+    if USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE) and
+    USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS) and
+    USER_CONFIG.has_option(constants.CONFIG_TILE, constants.CONFIG_TILE_POINTSIZES):
         TILE_SIZE = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_SIZE))
         DOMINANT_COLORS = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_DOMINANT_COLORS))
         LABEL_POINTSIZE = int(USER_CONFIG.get(constants.CONFIG_TILE, constants.CONFIG_TILE_POINTSIZES))
