@@ -215,6 +215,7 @@ def createCollage(directory_path):
             s = subprocess.Popen([
                 "convert",
                 joinPath(DIR_IMG, file),
+                "-auto-orient",
                 "-resize",
                 str(TILE_SIZE) + "x" + str(TILE_SIZE) + "^",
 #                "-gravity",
