@@ -155,7 +155,10 @@ def createCollageForColoModel (
         str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(
             DIR_IMG,
-            constants.FILE_PREFIX_COLLAGE + timestamp + str(DOMINANT_COLORS) + string_by_color_model[key_color_model][0]
+            constants.FILE_PREFIX_COLLAGE,
+            timestamp,
+            str(DOMINANT_COLORS),
+            string_by_color_model[key_color_model][0]
         )
     ])
     print string_by_color_model[key_color_model][1]
