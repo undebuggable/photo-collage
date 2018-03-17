@@ -1,14 +1,20 @@
 Photo collage with tiles sorted by their color models
----------------
+===============
+
+Introduction
+--------------
 
 This project converts a collection of images in a directory into a collage where the tile images are sorted by their color models. The tile images in an output collage are arranged in a grid as close to the square as possible, in order left to right, top to bottom. The supported color models are RGB, YIQ, HLS, HSV.
 
-Example invocation:
+
+Examples
+---------------
+### Example invocation:
 ```
 make collage-jpg DIR_IMG=/home/user1/Photos/my-holidays-in-exotic-place/
 ```
 
-Example output collages:
+### Example output collages:
 
 [Collage 1 color model RGB](https://ow.cx/static/collage-berlin-rgb.jpg)
 
