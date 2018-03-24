@@ -9,12 +9,12 @@ This project converts a collection of images in a directory into a collage where
 
 Examples
 ---------------
-### Example invocation:
+### Example invocation
 ```
 make collage-jpg DIR_IMG=/home/user1/Photos/my-holidays-in-exotic-place/
 ```
 
-### Example output collages:
+### Example output collages
 
 [Collage 1 color model RGB](https://ow.cx/static/collage-berlin-rgb.jpg)
 
