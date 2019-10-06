@@ -54,13 +54,14 @@ def sortColors():
         insert(c, "HLS")
         insert(c, "HSV")
 
-def drawColors(path, colors):
-    print constants.LOG_DRAWING_COLORS + path + "\n" + str(colors)
-    sectionHeight = TILE_SIZE*1/len(colors)
+def drawColors(path, colors_list):
+    print("{}{}\n{}".format(constants.LOG_DRAWING_COLORS, path, "\n", str(colors_list)))
+    colors_length = len(colors_list)
+    sectionHeight = TILE_SIZE*1/colors_length
     rectangles = []
-    for i in range(len(colors)):
+    for i in range(colors_length):
         rectangles.append(
-          "fill " + str(colors[i]) + " rectangle 0," + str(TILE_SIZE + i * sectionHeight) + " " + str(TILE_SIZE) + "," + str(TILE_SIZE + (i + 1) * sectionHeight)
+          "fill " + str(colors_list[i]) + " rectangle 0," + str(TILE_SIZE + i * sectionHeight) + " " + str(TILE_SIZE) + "," + str(TILE_SIZE + (i + 1) * sectionHeight)
         )
     s = subprocess.Popen([
         "convert",
@@ -68,7 +69,7 @@ def drawColors(path, colors):
         "-gravity",
         "North",
         "-background",
-        str(colors[0]),
+        str(colors_list[0]),
         "-extent",
         str(TILE_SIZE) + "x" + str(2*TILE_SIZE),
         "-draw",
@@ -77,9 +78,10 @@ def drawColors(path, colors):
     ])
     s.wait()
 
-def printLabels(path, colors):
-    print constants.LOG_DRAWING_LABELS + path + "\n" + str(colors)
-    sectionHeight = TILE_SIZE*1/len(colors)
+def printLabels(path, colors_list):
+    print("{}{}\n{}".format(constants.LOG_DRAWING_LABELS, path, str(colors_list)))
+    colors_length = len(colors_list)
+    sectionHeight = TILE_SIZE*1/colors_length
     labels = []
     printCommand = [
         "convert",
@@ -89,22 +91,22 @@ def printLabels(path, colors):
         "-pointsize",
         str(LABEL_POINTSIZE)
     ]
-    for i in range(len(colors)):
+    for i in range(colors_length):
         labels.extend([
             "-stroke",
             "#000C",
             "-strokewidth",
             "2",
             "-annotate",
-            "+0+" + str((len(colors) - i - 1) * sectionHeight + 35),
-            str(colors[i]),
+            "+0+" + str((colors_length - i - 1) * sectionHeight + 35),
+            str(colors_list[i]),
             "-stroke",
             "none",
             "-fill",
             "white",
             "-annotate",
-            "+0+" + str((len(colors) - i - 1) * sectionHeight + 35),
-            str(colors[i]),
+            "+0+" + str((colors_length - i - 1) * sectionHeight + 35),
+            str(colors_list[i]),
         ])
     printCommand.extend(labels)
     printCommand.append(path)
@@ -155,13 +157,15 @@ def createCollageForColoModel (
         str(count_tile_columns) + "x" + str(count_tile_rows),
         joinPath(
             DIR_IMG,
-            constants.FILE_PREFIX_COLLAGE,
-            timestamp,
-            str(DOMINANT_COLORS),
-            string_by_color_model[key_color_model][0]
+            "{}{}{}{}".format(
+                constants.FILE_PREFIX_COLLAGE,
+                timestamp,
+                str(DOMINANT_COLORS),
+                string_by_color_model[key_color_model][0]
+            )
         )
     ])
-    print string_by_color_model[key_color_model][1]
+    print(string_by_color_model[key_color_model][1])
     s = subprocess.Popen(command_collage)
     s.wait()
 
@@ -221,10 +225,6 @@ def createCollage(directory_path):
                 "-auto-orient",
                 "-resize",
                 str(TILE_SIZE) + "x" + str(TILE_SIZE) + "^",
-#                "-gravity",
-#                "center",
-#                "-extent",
-#                str(TILE_SIZE) + "x" + str(TILE_SIZE),
                 path_collage
             ])
             s.wait()
@@ -232,17 +232,18 @@ def createCollage(directory_path):
             cropped.save(path_collage)
             shutil.copyfile(path_collage, path_dominant)
             colorz = dominant_colors.colorz(path_collage, DOMINANT_COLORS)
-            drawColors(path_dominant, colorz)
-            printLabels(path_dominant, colorz)
+            colors_list = list(map(str, colorz))
+            drawColors(path_dominant, colors_list)
+            printLabels(path_dominant, colors_list)
             rgb = [
-                strToFraction("".join([colorz[0][1], colorz[0][2]])),
-                strToFraction("".join([colorz[0][3], colorz[0][4]])),
-                strToFraction("".join([colorz[0][5], colorz[0][6]]))
+                strToFraction("".join([colors_list[0][1], colors_list[0][2]])),
+                strToFraction("".join([colors_list[0][3], colors_list[0][4]])),
+                strToFraction("".join([colors_list[0][5], colors_list[0][6]]))
             ]
             colors.append({
                 "path_dominant": path_dominant,
                 "path_collage": path_collage,
-                "RGB_string": colorz[0],
+                "RGB_string": colors_list[0],
                 "RGB": rgb,
                 "YIQ": colorsys.rgb_to_yiq(rgb[0], rgb[1], rgb[2]),
                 "HSV": colorsys.rgb_to_hsv(rgb[0], rgb[1], rgb[2]),
@@ -284,4 +285,4 @@ def createCollage(directory_path):
             key_color_model, command_collage, count_tile_rows, count_tile_columns
         )
 
-    print "\nTotal " + str(photoCount) + " images"
+    print("\nTotal {} images".format(str(photoCount)))

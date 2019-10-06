@@ -1,4 +1,3 @@
-#http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/
 from collections import namedtuple
 from math import sqrt
 import random
@@ -20,8 +19,7 @@ def get_points(img):
 rtoh = lambda rgb: '#%s' % ''.join(('%02x' % p for p in rgb))
 
 def colorz(filename, n=3):
-    #http://stackoverflow.com/questions/4643847/python-how-to-get-a-list-of-color-that-used-in-one-image
-    print "\nLooking for " + str(n) + " dominant colors\n" + filename
+    print("\nLooking for {} dominant colors\n{}".format(str(n), filename))
     img = Image.open(filename)
     img = img.convert('RGB',colors=128000)
     #img = img.convert()
