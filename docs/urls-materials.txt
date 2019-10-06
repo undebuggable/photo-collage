@@ -1,0 +1,4 @@
+http://stackoverflow.com/questions/4643847/python-how-to-get-a-list-of-color-that-used-in-one-image
+http://charlesleifer.com/blog/using-python-and-k-means-to-find-the-dominant-colors-in-images/
+https://stackoverflow.com/questions/36982858/object-of-type-map-has-no-len-in-python-3
+https://stackoverflow.com/questions/6800481/python-map-object-is-not-subscriptable
